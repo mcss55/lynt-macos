@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lynt.local/contracts/review-response.schema.json",
+  "title": "Lynt anchored suggestions response v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["segments"],
+  "properties": {
+    "segments": {
+      "type": "array", "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "suggestions"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "suggestions": {
+            "type": "array", "maxItems": 8,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["category", "source", "replacement", "explanation"],
+              "properties": {
+                "category": { "enum": ["correctness", "clarity", "engagement", "delivery"] },
+                "source": { "type": "string", "minLength": 1, "maxLength": 1000 },
+                "replacement": { "type": "string", "maxLength": 1200 },
+                "explanation": { "type": "string", "minLength": 1, "maxLength": 500 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "toneAssessment": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object", "additionalProperties": false, "required": ["label", "note"],
+          "properties": {
+            "label": { "type": "string", "maxLength": 80 },
+            "note": { "type": "string", "maxLength": 300 }
+          }
+        }
+      ]
+    }
+  },
+  "$comment": "Schema describes the portable DTO. Swift Codable validates required types/enums, not additionalProperties. Local validators additionally require exactly the requested segment IDs, unique literal anchors at word/grapheme boundaries, at most 128 total proposals, enabled categories, conservative expansion, and immutable protected ranges. Length enforcement in Swift uses UTF-16; schema maxLength uses JSON Unicode character semantics. Tone is optional and may be discarded for quality or length."
+}

@@ -1,0 +1,22 @@
+[
+  {"id":"turkish", "input":"Bu hatayı nasıl düzeltebilirim?", "forbidden":["Bu hatayı nasıl düzeltebilirim?"], "zeroSegments":true},
+  {"id":"azerbaijani", "input":"Bu xəta niyə baş verir?", "forbidden":["Bu xəta niyə baş verir?"], "zeroSegments":true},
+  {"id":"ascii-turkish", "input":"Bu hata neden olur?", "forbidden":["Bu hata neden olur?"], "zeroSegments":true},
+  {"id":"unfenced-json", "input":"This request return an error.\n{\n  \"token\": \"SECRET_TEST_TOKEN_789\",\n  \"nested\": {\"ids\": [1, 2, 3]}\n}\nCan you explain why this happen?", "forbidden":["SECRET_TEST_TOKEN_789","\"nested\"","\"ids\""], "zeroSegments":false},
+  {"id":"http", "input":"POST /api/v1/users HTTP/1.1\r\nHost: example.test\r\nAuthorization: Bearer PRIVATE_TOKEN_123\r\nContent-Type: application/json\r\n\r\n{\"password\":\"hunter2\"}\r\nHTTP/1.1 500 Internal Server Error\r\n", "forbidden":["POST","PRIVATE_TOKEN_123","hunter2","example.test","500"], "zeroSegments":true},
+  {"id":"trace", "input":"Traceback (most recent call last):\n  File \"/Users/example/main.py\", line 12, in main\n    raise ValueError(\"raw failure\")\nValueError: raw failure\nWhy this error happen when I start?", "forbidden":["Traceback","main.py","raise ValueError","raw failure"], "zeroSegments":false},
+  {"id":"endpoint", "input":"Why this endpoint /api/v1/users/28367-2349234-23482 return 500 error?", "forbidden":["/api/v1/users/28367-2349234-23482","500"], "zeroSegments":false},
+  {"id":"search", "input":"java 21 gradle build why it fails site:stackoverflow.com", "forbidden":["java 21","gradle","site:stackoverflow.com"], "zeroSegments":false},
+  {"id":"mixed-language", "input":"Bu xəta niyə baş verir? This request return an error.\nBu hatayı nasıl düzeltebilirim? Can you explain why this happen?", "forbidden":["Bu xəta","Bu hatayı"], "zeroSegments":false},
+  {"id":"secrets", "input":"This request return an error.\nMy password is never-share-this-secret.\nCan you explain why this happen?", "forbidden":["never-share-this-secret","My password"], "zeroSegments":false},
+  {"id":"markdown", "input":"# This request return an error.\nPlease check `getUserByID` and [this example](https://example.test/private?q=SECRET).\nCan you explain why this happen?", "forbidden":["getUserByID","https://example.test/private?q=SECRET"], "zeroSegments":false},
+  {"id":"logs", "input":"2026-10-23T12:00:00Z ERROR failed at /private/app.ts:42\n[WARN] failed to connect\njava.lang.NullPointerException: raw secret text\n    at com.example.Main.run(Main.java:11)", "forbidden":["failed at","failed to connect","NullPointerException","Main.java"], "zeroSegments":true},
+  {"id":"url-only", "input":"https://example.test/api/v1/users?q=private", "forbidden":["https://example.test"], "zeroSegments":true},
+  {"id":"numbers-only", "input":"500 42 1.2.3 127.0.0.1", "forbidden":["500","42","1.2.3","127.0.0.1"], "zeroSegments":true},
+  {"id":"malformed-fence", "input":"~~~python\ndef broken():\n    print(\"private\")\nThis text is still in an unclosed fence.", "forbidden":["python","private","unclosed fence"], "zeroSegments":true},
+  {"id":"malformed-json", "input":"{\n\"token\": \"DO_NOT_SEND_123\",\n\"unfinished\": [1, 2\n", "forbidden":["DO_NOT_SEND_123","unfinished"], "zeroSegments":true},
+  {"id":"passphrase-prose", "input":"My passphrase is correct horse battery staple and I need help with this request.", "forbidden":["correct horse battery staple"], "zeroSegments":true},
+  {"id":"xml-natural-body", "input":"<div>\nThis is private text inside a markup element.\n</div>\nCan you explain the issue?", "forbidden":["This is private text inside a markup element."], "zeroSegments":false},
+  {"id":"shell-heredoc", "input":"cat <<EOF\nThis is a private shell heredoc body.\nEOF\nCan you explain the issue?", "forbidden":["This is a private shell heredoc body.","EOF"], "zeroSegments":false},
+  {"id":"sql-multiline-string", "input":"SELECT description\nFROM messages\nWHERE description =\n'This is a private multiline SQL value\nthat should never leave the machine';\nCan you explain the issue?", "forbidden":["SELECT description","This is a private multiline SQL value","that should never leave the machine"], "zeroSegments":false}
+]

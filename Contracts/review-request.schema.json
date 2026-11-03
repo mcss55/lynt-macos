@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lynt.local/contracts/review-request.schema.json",
+  "title": "Lynt isolated English prose review request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task", "enabledCategories", "tone", "contextKind", "segments"],
+  "properties": {
+    "task": { "const": "review_english_prose" },
+    "enabledCategories": {
+      "type": "array", "uniqueItems": true, "maxItems": 4,
+      "items": { "enum": ["correctness", "clarity", "engagement", "delivery"] }
+    },
+    "tone": {
+      "type": "object", "additionalProperties": false, "required": ["detect", "target"],
+      "properties": {
+        "detect": { "type": "boolean" },
+        "target": { "enum": ["preserve", "formal", "confident", "friendly", "professional"] }
+      }
+    },
+    "contextKind": { "enum": ["prompt", "search", "general"] },
+    "segments": {
+      "type": "array", "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "text": { "type": "string", "minLength": 1, "description": "Eligible English prose only. No original document, offsets, protected content, or placeholders." }
+        }
+      }
+    }
+  },
+  "$comment": "Unique segment IDs and a combined 24,000 UTF-8 byte prose limit are enforced in code. Empty eligible prose makes zero network requests. Search uses correctness only. Source offsets never leave the app."
+}

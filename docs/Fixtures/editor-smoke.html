@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lynt · Synthetic editor smoke test</title>
+<style>
+  :root { color-scheme: light dark; font: 16px/1.5 system-ui, sans-serif; }
+  body { max-width: 850px; margin: 32px auto; padding: 0 24px 64px; }
+  h1 { font-size: 25px; margin-bottom: 6px; }
+  p { margin-top: 4px; }
+  section { padding: 18px; margin: 18px 0; border: 1px solid #8887; border-radius: 12px; }
+  label, .field-label { font-weight: 600; display: block; margin-bottom: 7px; }
+  input, textarea, [contenteditable] { box-sizing: border-box; width: 100%; font: inherit; padding: 12px; border: 1px solid #8889; border-radius: 7px; }
+  textarea { min-height: 110px; resize: vertical; }
+  [contenteditable] { min-height: 100px; }
+  .hint { font-size: 13px; opacity: .7; }
+  output { display: block; margin-top: 8px; font-size: 13px; opacity: .75; }
+  button { padding: 8px 14px; font: inherit; }
+  :focus-visible { outline: 3px solid #6ba7d7; outline-offset: 2px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+</style>
+<body>
+<h1>Lynt editor smoke test</h1>
+<p>Local synthetic text only. This page makes no network requests and never navigates on submission.</p>
+<p class="hint">Type into a field, pause, then inspect the floating suggestions. Test moving the caret, switching fields or tabs during a review, and accepting a change. Verify that only the intended field changes.</p>
+<form id="test-form">
+  <section>
+    <label for="plain-input">Standard text input</label>
+    <input id="plain-input" name="plain" autocomplete="off" spellcheck="false" value="He don't knows the answer.">
+    <output data-events-for="plain-input">Input events: 0 · Change events: 0</output>
+  </section>
+  <section>
+    <label for="multiline">Standard textarea</label>
+    <textarea id="multiline" name="multiline" spellcheck="false">He don't knows the answer.
+Can you explain why this happen?</textarea>
+    <output data-events-for="multiline">Input events: 0 · Change events: 0</output>
+  </section>
+  <section>
+    <div class="field-label" id="editable-label">Plain contenteditable</div>
+    <div id="editable" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="editable-label" spellcheck="false">He don't knows the answer. Can you explain why this happen?</div>
+    <output data-events-for="editable">Input events: 0 · Change events: 0</output>
+  </section>
+  <section>
+    <div class="field-label" id="rich-label">Contenteditable with nested rich text</div>
+    <div id="rich" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="rich-label" spellcheck="false"><p>He <strong>don't knows</strong> the answer.</p><p>Please preserve this <em>formatting</em> when changing a single phrase.</p></div>
+    <output data-events-for="rich">Input events: 0 · Change events: 0</output>
+  </section>
+  <section>
+    <label for="protected">Protected code + English</label>
+    <textarea id="protected" name="protected" spellcheck="false">He don't knows the answer.
+```typescript
+const privateValue = "SYNTHETIC_DO_NOT_SEND";
+```
+Can you explain why this happen?</textarea>
+    <output data-events-for="protected">Input events: 0 · Change events: 0</output>
+  </section>
+  <section>
+    <label for="non-english">Turkish / Azerbaijani — expect no review</label>
+    <textarea id="non-english" name="nonEnglish" spellcheck="false">Bu hatayı nasıl düzeltebilirim?
+Bu xəta niyə baş verir?</textarea>
+    <label for="secure">Password — must never be captured</label>
+    <input id="secure" type="password" autocomplete="off" value="synthetic-password-only">
+    <label for="read-only">Read-only — must not be treated as editable</label>
+    <input id="read-only" readonly value="This read-only field should never receive edits.">
+  </section>
+  <button type="submit">Synthetic submit (prevents navigation)</button>
+  <output id="submissions">Submissions: 0</output>
+</form>
+<script>
+  // Local DOM counters verify whether the browser notifies a site's editing model.
+  // No console logging, storage, fetch, or third-party resources.
+  for (const output of document.querySelectorAll('[data-events-for]')) {
+    const target = document.getElementById(output.dataset.eventsFor);
+    let inputs = 0, changes = 0;
+    const update = () => { output.textContent = `Input events: ${inputs} · Change events: ${changes}`; };
+    target.addEventListener('input', () => { inputs += 1; update(); });
+    target.addEventListener('change', () => { changes += 1; update(); });
+  }
+  let submissions = 0;
+  document.getElementById('test-form').addEventListener('submit', event => {
+    event.preventDefault();
+    submissions += 1;
+    document.getElementById('submissions').textContent = `Submissions: ${submissions}`;
+  });
+</script>
+</body>
+</html>

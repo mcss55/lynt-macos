@@ -1,0 +1,12 @@
+.build/
+.swiftpm/
+build/
+DerivedData/
+.DS_Store
+*.xcuserstate
+xcuserdata/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
